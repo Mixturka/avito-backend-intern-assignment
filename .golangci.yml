@@ -54,7 +54,7 @@ issues:
   max-same-issues: 5
   max-issues-per-linter: 0
 
-  exclude-rules:
-    - linters:
-        - testpackage
-      path: "_test\\.go$"
+exclude-rules:
+  - linters:
+      - testpackage
+    path: "_test\\.go$"
