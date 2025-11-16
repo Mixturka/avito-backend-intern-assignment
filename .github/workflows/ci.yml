@@ -23,7 +23,7 @@ jobs:
       SERVER_PORT: 8080
     steps:
       - uses: actions/checkout@v5
-      - uses: actions/setup-go@v6
+      - uses: actions/setup-go@v5
         with:
           go-version: stable
 
