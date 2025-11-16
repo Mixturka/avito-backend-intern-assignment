@@ -135,9 +135,21 @@ func TestPullRequest_Reassign_Success(t *testing.T) {
 		t.Fatalf("failed to create new PR for reassignment test, got %d", newPRRec.Code)
 	}
 
+	var createdPR api.PostPullRequestCreate201JSONResponse
+	if err := json.Unmarshal(newPRRec.Body.Bytes(), &createdPR); err != nil {
+		t.Fatalf("failed to parse created PR: %v", err)
+	}
+
+	if len(createdPR.Pr.AssignedReviewers) == 0 {
+		t.Fatalf("no reviewers assigned to PR, cannot test reassignment")
+	}
+
+	oldReviewer := createdPR.Pr.AssignedReviewers[0]
+	t.Logf("Testing reassignment for reviewer: %s", oldReviewer)
+
 	body := api.PostPullRequestReassignJSONBody{
 		PullRequestId: "pr-reassign-test",
-		OldUserId:     "u2",
+		OldUserId:     oldReviewer,
 	}
 
 	data, _ := json.Marshal(body)
@@ -160,7 +172,7 @@ func TestPullRequest_Reassign_Success(t *testing.T) {
 		t.Fatalf("expected replaced_by user_id, got empty")
 	}
 
-	t.Logf("Reassigned reviewer: %s", resp.ReplacedBy)
+	t.Logf("Reassigned reviewer: %s -> %s", oldReviewer, resp.ReplacedBy)
 }
 
 func TestPullRequest_Reassign_NotAssigned(t *testing.T) {
