@@ -38,7 +38,7 @@ test-e2e:
 		test_exit_code=$$?; \
 		echo "Resetting test database..."; \
 		goose -dir db/migrations postgres "postgres://postgres:postgres@localhost:${DB_PORT}/testdb?sslmode=disable" reset; \
-		docker-compose -f $(TEST_COMPOSE) down -d postgres-test;
+		docker-compose -f $(TEST_COMPOSE) down postgres-test;
 		exit $$test_exit_code
 
 .PHONY: logs
