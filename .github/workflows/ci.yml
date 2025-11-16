@@ -11,7 +11,7 @@ permissions:
 
 jobs:
   golangci:
-    name: lint
+    name: lint & e2e
     runs-on: ubuntu-latest
     env:
       DB_NAME: avito
@@ -23,9 +23,22 @@ jobs:
       SERVER_PORT: 8080
     steps:
       - uses: actions/checkout@v5
+
       - uses: actions/setup-go@v6
         with:
           go-version: stable
+
+      - name: Install Docker Compose
+        run: |
+          sudo curl -L "https://github.com/docker/compose/releases/download/v2.23.0/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+          sudo chmod +x /usr/local/bin/docker-compose
+          docker-compose version
+
+      - name: Install Goose
+        run: |
+          go install github.com/pressly/goose/v3/cmd/goose@latest
+          export PATH=$PATH:$(go env GOPATH)/bin
+          goose --version
 
       - name: golangci-lint
         uses: golangci/golangci-lint-action@v8
@@ -45,4 +58,3 @@ jobs:
 
       - name: Run E2E tests
         run: make test-e2e
-  
