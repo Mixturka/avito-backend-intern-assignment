@@ -1,0 +1,21 @@
+FROM alpine:latest
+
+RUN apk --no-cache add postgresql-client
+
+RUN wget -O /usr/local/bin/goose https://github.com/pressly/goose/releases/download/v3.15.1/goose_linux_x86_64 && \
+    chmod +x /usr/local/bin/goose
+
+COPY db/migrations /migrations
+
+RUN echo '#!/bin/sh' > /wait-for-db.sh && \
+    echo 'until pg_isready -h postgres -p 5432 -U $DB_USER -d $DB_NAME; do' >> /wait-for-db.sh && \
+    echo '  echo "Waiting for database to be ready..."' >> /wait-for-db.sh && \
+    echo '  sleep 2' >> /wait-for-db.sh && \
+    echo 'done' >> /wait-for-db.sh && \
+    echo 'echo "Database is ready! Running migrations..."' >> /wait-for-db.sh && \
+    echo 'goose -dir /migrations postgres "$GOOSE_DSN" up' >> /wait-for-db.sh && \
+    chmod +x /wait-for-db.sh
+
+WORKDIR /
+
+CMD ["sh", "-c", "DB_USER=${DB_USER} DB_NAME=${DB_NAME} /wait-for-db.sh"]

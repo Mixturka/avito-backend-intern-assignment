@@ -1,0 +1,60 @@
+version: "2"
+
+linters:
+  enable:
+    - decorder
+    - errcheck
+    - ineffassign
+    - misspell
+    - revive
+    - staticcheck
+    - testpackage
+    - unused
+    - prealloc
+
+  settings:
+    decorder:
+      dec-order:
+        - const
+        - var
+        - type
+        - func
+    
+    misspell:
+      locale: US
+
+    errcheck:
+      exclude-functions:
+        - fmt.Fprintln
+        - fmt.Fprintf
+        - fmt.Println
+        - fmt.Printf
+
+    revive:
+      confidence: 0.8
+      severity: warning
+      rules:
+        - name: indent-error-flow
+        - name: error-naming
+        - name: unhandled-error
+        - name: unused-parameter
+        - name: empty-block
+        - name: unreachable-code
+
+    prealloc:
+      simple: true
+      range-loops: true
+
+formatters:
+  enable:
+    - goimports
+    - gofumpt
+
+issues:
+  max-same-issues: 5
+  max-issues-per-linter: 0
+
+  exclude-rules:
+    - linters:
+        - testpackage
+      path: "_test\\.go$"

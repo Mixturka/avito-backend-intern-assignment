@@ -1,0 +1,37 @@
+name: Lint & Test
+
+on:
+  push:
+    branches: [ $default-branch ]
+  pull_request:
+    branches: [ $default-branch ]
+
+permissions:
+  contents: read
+
+jobs:
+  golangci:
+    name: lint
+    runs-on: ubuntu-latest
+    env:
+      DB_NAME: avito
+      DB_USER: avito_user
+      DB_PASSWORD: avito_pass
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_SSLMODE: disable
+      GOOSE_DSN: postgres://${{ env.DB_USER }}:${{ env.DB_PASSWORD }}@${{ env.DB_HOST }}:${{ env.DB_PORT }}/${{ env.DB_NAME }}?sslmode=${{ env.DB_SSLMODE }}
+      SERVER_PORT: 8080
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-go@v6
+        with:
+          go-version: stable
+
+      - name: golangci-lint
+        uses: golangci/golangci-lint-action@v8
+        with:
+          version: v2.1
+
+      - name: Run E2E tests
+        run: make test-e2e
